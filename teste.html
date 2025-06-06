@@ -6,7 +6,50 @@
     <title>XP Point - Trocas e Vendas de Cartas Pokémon</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tab-btn {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #e63946;
+            color: white;
+        }
+        
+        .card-actions {
+            margin-top: 10px;
+        }
+        
+        .buy-btn {
+            padding: 8px 16px;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .buy-btn:hover {
+            background: #c1121f;
+        }
+    </style>
 
 </head>
 <body>
@@ -24,21 +67,90 @@
         <div class="container">
             <div class="section-title">
                 <h2>Todas as cartas</h2>
+                <div class="category-tabs">
+                    <button class="tab-btn active" data-category="all">Todas</button>
+                    <button class="tab-btn" data-category="gx">GX</button>
+                    <button class="tab-btn" data-category="v">V</button>
+                    <button class="tab-btn" data-category="ex">EX</button>
+                    <button class="tab-btn" data-category="vmax">VMAX</button>
+                </div>
             </div>
-            <div class="cards-grid">
-                <div class="card-item">
-                    <div class="card-image">
-                        <img src="img/mimikyu-gx.png" alt="Charizard">
-                        <span class="card-badge">Rara</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>mimikyu-GX</h3>
-                        <p>Condição: danificado ou - D</p>
-                        <div class="card-price">R$ 75,00 (valor atual 02/06/2025)</div>
-                        <div class="card-actions">
+            <div class="cards-grid" id="cards-container"></div>
+        </div>
+    </section>
+
+    <script>
+        const cardsData = [
+            {name: "mimikyu-GX", type: "gx", image: "mimikyu-gx.png", condition: "danificado ou - D", price: "75,00"},
+            {name: "empoleon turbo", type: "v", image: "empoleon.png", condition: "danificado ou - D", price: "6,30"},
+            {name: "ultra necrozma-GX", type: "gx", image: "necrozma-GX.png", condition: "muito usada ou - HP", price: "41,31"},
+            {name: "alcremie-vmax", type: "vmax", image: "alcremie-vmax.png", condition: "usada levemente ou - SP", price: "30,00"},
+            {name: "necrozma-v", type: "v", image: "Necrozma-V.png", condition: "usada levemente ou - SP", price: "7,00"},
+            {name: "zapdos-ex", type: "ex", image: "zapdos-ex.png", condition: "usada levemente ou - SP", price: "9,00"},
+            {name: "tyranitar-gx", type: "gx", image: "tyranitar-gx.png", condition: "muito usada ou - HP", price: "19,92"},
+            {name: "Boltund-V", type: "v", image: "Boltund-V.png", condition: "usada levemente ou - SP", price: "9,00"},
+            {name: "Venomoth-GX", type: "gx", image: "venomoth-GX.png", condition: "usada levemente ou - SP", price: "9,00"},
+            {name: "Salazzle-GX", type: "gx", image: "Salazzle-GX.png", condition: "usada levemente ou - SP", price: "8,00"},
+            {name: "Pidgeot-V", type: "v", image: "Pidgeot-V.png", condition: "praticamente nova ou - NM", price: "29,00"},
+            {name: "Falinks-V", type: "v", image: "Falinks-V.png", condition: "usada levemente ou - SP", price: "6,79"},
+            {name: "Sandaconda-V", type: "v", image: "Sandaconda-V.png", condition: "danificada ou - D", price: "6,00"},
+            {name: "Corviknight-V", type: "v", image: "Corviknight-V1.png", condition: "praticamente nova ou - NM", price: "8,00"},
+            {name: "Corviknight-V", type: "v", image: "corviknight-v2.png", condition: "praticamente nova ou - NM", price: "7,00"},
+            {name: "Granbull-V", type: "v", image: "Granbull-V.png", condition: "praticamente nova ou - NM", price: "7,00"},
+            {name: "Tapu Lele-GX", type: "gx", image: "Tapu Lele-GX.png", condition: "danificada ou - D", price: "9,00"},
+            {name: "Stoutland-V", type: "v", image: "Stoutland-V.png", condition: "usada levemente ou - SP", price: "7,49"},
+            {name: "Suicune-V", type: "v", image: "Suicune-V.png", condition: "praticamente nova ou - NM", price: "9,49"},
+            {name: "Darkrai-GX", type: "gx", image: "Darkrai-GX.png", condition: "usada moderadamente ou - MP", price: "15,00"},
+            {name: "Darkrai-GX", type: "gx", image: "Darkrai-GX (88a/147).png", condition: "usada levemente ou - SP", price: "20,00"},
+            {name: "raikou-v", type: "v", image: "raikou-v.png", condition: "usada levemente ou - SP", price: "15,00"},
+            {name: "Tapu Koko-GX", type: "gx", image: "Tapu Koko-GX.png", condition: "muito usada ou - HP", price: "8,00"},
+            {name: "Arceus-V-ASTRO", type: "v", image: "Arceus-V-ASTRO.png", condition: "praticamente nova ou - NM", price: "25,00"},
+            {name: "Garbodor-V", type: "v", image: "Garbodor-V.png", condition: "praticamente nova ou - NM", price: "7,00"},
+            {name: "Stunfisk de Galar-V", type: "v", image: "Stunfisk de Galar-V.png", condition: "praticamente nova ou - NM", price: "10,00"},
+            {name: "Drednaw-VMAX", type: "vmax", image: "Drednaw-VMAX.png", condition: "praticamente nova ou - NM", price: "13,28"},
+            {name: "Volcanion-EX", type: "ex", image: "Volcanion-EX.png", condition: "usada moderadamente ou - MP", price: "10,00"}
+        ];
+
+        function renderCards(category = 'all') {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            const filteredCards = category === 'all' 
+                ? cardsData 
+                : cardsData.filter(card => card.type === category);
+
+            filteredCards.forEach(card => {
+                container.innerHTML += `
+                    <div class="card-item" data-type="${card.type}">
+                        <div class="card-image">
+                            <img src="img/${card.image}" alt="${card.name}">
+                            <span class="card-badge">Rara</span>
+                        </div>
+                        <div class="card-info">
+                            <h3>${card.name}</h3>
+                            <p>Condição: ${card.condition}</p>
+                            <div class="card-price">R$ ${card.price} (valor atual 02/06/2025)</div>
+                            <div class="card-actions">
+                                <button class="btn buy-btn">Comprar</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                `;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCards();
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderCards(btn.dataset.category);
+                });
+            });
+        });
+    </script>
                 <div class="card-item">
                     <div class="card-image">
                         <img src="img/empoleon.png" alt="Blastoise">
@@ -392,52 +504,64 @@
                 </div>
                                 <div class="card-item">
                     <div class="card-image">
-                        <img src="img/Exílio do Giovanni.png" alt="Pikachu">
+                        <img src="img/Necrozma-V.png" alt="Pikachu">
                            <span class="card-badge">Rara</span>
                     </div>
                     <div class="card-info">
-                        <h3>Exílio do Giovanni</h3>
-                        <p>Condição: danificada ou - D</p>
-                        <div class="card-price">R$ 44,00 (valor atual 02/06/2025)</div>
-                        <div class="card-actions">
-                        </div>
-                    </div>
-                </div>
-                                <div class="card-item">
-                    <div class="card-image">
-                        <img src="img/Xerneas-EX.png" alt="Pikachu">
-                           <span class="card-badge">Rara</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>Xerneas-EX </h3>
-                        <p>Condição: usada moderadamente ou - MP</p>
-                        <div class="card-price">R$ 20,00 (valor atual 02/06/2025)</div>
-                        <div class="card-actions">
-                        </div>
-                    </div>
-                </div>
-                                <div class="card-item">
-                    <div class="card-image">
-                        <img src="img/Kangaskhan-GX.png" alt="Pikachu">
-                           <span class="card-badge">Rara</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>Kangaskhan-GX</h3>
-                        <p>Condição: danificada ou - D</p>
-                        <div class="card-price">R$ 9,00 (valor atual 02/06/2025)</div>
-                        <div class="card-actions">
-                        </div>
-                    </div>
-                </div>
-                <div class="card-item">
-                    <div class="card-image">
-                        <img src="img/Wooloo do Lupo.png" alt="Pikachu">
-                           <span class="card-badge">Rara</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>Wooloo do Lupo</h3>
+                        <h3>necrozma-v</h3>
                         <p>Condição: usada levemente ou - SP</p>
-                        <div class="card-price">R$ 15,80 (valor atual 02/06/2025)</div>
+                        <div class="card-price">R$ 7,00 (valor atual 02/06/2025)</div>
+                        <div class="card-actions">
+                        </div>
+                    </div>
+                </div>
+                                <div class="card-item">
+                    <div class="card-image">
+                        <img src="img/Necrozma-V.png" alt="Pikachu">
+                           <span class="card-badge">Rara</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>necrozma-v</h3>
+                        <p>Condição: usada levemente ou - SP</p>
+                        <div class="card-price">R$ 7,00 (valor atual 02/06/2025)</div>
+                        <div class="card-actions">
+                        </div>
+                    </div>
+                </div>
+                                <div class="card-item">
+                    <div class="card-image">
+                        <img src="img/Necrozma-V.png" alt="Pikachu">
+                           <span class="card-badge">Rara</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>necrozma-v</h3>
+                        <p>Condição: usada levemente ou - SP</p>
+                        <div class="card-price">R$ 7,00 (valor atual 02/06/2025)</div>
+                        <div class="card-actions">
+                        </div>
+                    </div>
+                </div>
+                                <div class="card-item">
+                    <div class="card-image">
+                        <img src="img/Necrozma-V.png" alt="Pikachu">
+                           <span class="card-badge">Rara</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>necrozma-v</h3>
+                        <p>Condição: usada levemente ou - SP</p>
+                        <div class="card-price">R$ 7,00 (valor atual 02/06/2025)</div>
+                        <div class="card-actions">
+                        </div>
+                    </div>
+                </div>                <div class="card-item">
+                    <div class="card-image">
+                        <img src="img/Necrozma-V.png" alt="Pikachu">
+                           <span class="card-badge">Rara</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>necrozma-v</h3>
+                        <p>Condição: usada levemente ou - SP</p>
+                        <div class="card-price">R$ 7,00 (valor atual 02/06/2025)</div>
                         <div class="card-actions">
                         </div>
                     </div>
